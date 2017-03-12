@@ -14,7 +14,7 @@ public class FauxGravityBody : MonoBehaviour {
         //get reference to this objects rigidbody
         m_MyRigid = GetComponent<Rigidbody>();
         //prevent own rotation -> no falling over
-        m_MyRigid.constraints = RigidbodyConstraints.FreezeRotation;
+        m_MyRigid.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
         //turn off gravity for this object
         m_MyRigid.useGravity = false;
 	}

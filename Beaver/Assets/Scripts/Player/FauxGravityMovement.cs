@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Movement Controller for objects under influence of Faux Gravity
-public class FauxGravityMovement : MonoBehaviour {
+public class FauxGravityMovement : MonoBehaviour
+{
 
     public float moveSpeed = 15.0f; //moveSpeed at which object moves
     public float jumpForce = 200.0f; //amount of acceleration used in jumps
@@ -13,21 +14,48 @@ public class FauxGravityMovement : MonoBehaviour {
     Vector3 m_v3SmoothMoveVelocity; //smooths out movement
     Rigidbody m_Rigid; //reference to this objects rigidbody
 
+    private Animator m_Animator;
+
     void Start()
     {
         m_Rigid = GetComponent<Rigidbody>();
+        m_Animator = GetComponent<Animator>();
     }
 
     void Update()
     {
         GetMoveInput();
         Jump();
+        if(GetComponent<Rigidbody>().velocity.y < 0.0f)
+        {
+            m_Animator.SetBool("Falling", true);
+        }
+        else
+        {
+            m_Animator.SetBool("Falling", false);
+        }
     }
 
     void FixedUpdate()
     {
-        Vector3 localMove = transform.TransformDirection(m_v3MoveAmount) * Time.fixedDeltaTime;
-        m_Rigid.MovePosition(m_Rigid.position + localMove);
+            Vector3 localMove = transform.TransformDirection(m_v3MoveAmount) * Time.fixedDeltaTime;
+            m_Rigid.MovePosition(m_Rigid.position + localMove);
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Vine" || collision.gameObject.tag == "VineHead" || collision.gameObject.tag == "VineRoot")
+        {
+            m_Animator.SetBool("Attack", true);
+        }
+    }
+
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Vine" || collision.gameObject.tag == "VineHead" || collision.gameObject.tag == "VineRoot")
+        {
+            m_Animator.SetBool("Attack", false);
+        }
     }
 
     //gets movement for controlled object
@@ -39,6 +67,21 @@ public class FauxGravityMovement : MonoBehaviour {
 
         //set GetMoveInput direction
         Vector3 moveDir = new Vector3(inputX, 0, 0).normalized;
+        if(moveDir.x > 0)
+        {
+            m_Animator.SetBool("Right", true);
+            m_Animator.SetBool("Left", false);
+        }
+        else if(moveDir.x < 0)
+        {
+            m_Animator.SetBool("Right", false);
+            m_Animator.SetBool("Left", true);
+        }
+        else
+        {
+            m_Animator.SetBool("Right", false);
+            m_Animator.SetBool("Left", false);
+        }
         //get the amount to move
         Vector3 targetMoveAmount = moveDir * moveSpeed;
 
@@ -52,6 +95,7 @@ public class FauxGravityMovement : MonoBehaviour {
         {
             if (CheckGrounded())
             {
+                m_Animator.SetTrigger("Jump");
                 m_Rigid.AddForce(transform.up * jumpForce);
             }
         }
@@ -63,7 +107,7 @@ public class FauxGravityMovement : MonoBehaviour {
         Ray ray = new Ray(transform.position, -transform.up);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, 1 + 0.2f))
+        if (Physics.Raycast(ray, out hit, 5.5f + 0.2f))
         {
             return true;
         }
