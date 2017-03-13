@@ -156,7 +156,7 @@ public class Vine : MonoBehaviour
 
                 GetComponent<DestroyVine>().PassChildren(m_Child, m_Child2);
 
-                if(gameObject.tag != "VineRoot") gameObject.tag = "Vine";
+                if (gameObject.tag != "VineRoot") gameObject.tag = "Vine";
                 IDLE = true;
             }
             else if(m_bSplit && MaxSplits <= 0)
@@ -172,7 +172,10 @@ public class Vine : MonoBehaviour
 
                 GetComponent<DestroyVine>().PassChildren(m_Child, null);
 
-                if (gameObject.tag != "VineRoot") gameObject.tag = "Vine";
+                if (!gameObject.CompareTag("VineHead"))
+                {
+                    gameObject.tag = "Vine";
+                }
                 IDLE = true;
             }          
         }
