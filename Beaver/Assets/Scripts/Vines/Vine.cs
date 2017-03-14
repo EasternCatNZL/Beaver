@@ -6,23 +6,25 @@ public class Vine : MonoBehaviour
 {
     public int m_iID;
 
+    
     public float GrowthRate;
     public float SplitChance;
     public float MaxTurnAngle;
     public Object VinePrefab;
+    public Material[] VineMaterials;
 
-    public float m_fTimer;
-    public Vector3 m_vDirection = new Vector3(0.0f, -1.0f, 0.0f);
-    public float m_fNextAngle;
-    public bool m_bGrowRight;
-    public bool m_bSplit = false;
-    public GameObject m_Parent;
-    public GameObject m_Child;
-    public GameObject m_Child2;
+    private float m_fTimer;
+    private Vector3 m_vDirection = new Vector3(0.0f, -1.0f, 0.0f);
+    private float m_fNextAngle;
+    private bool m_bGrowRight;
+    private bool m_bSplit = false;
+    private GameObject m_Parent;
+    private GameObject m_Child;
+    private GameObject m_Child2;
 
-    public bool IDLE = false;
+    private bool IDLE = false;
     static int CubeID = 0;
-    static int MaxSplits = 5;
+    static int MaxSplits = 10;
 
     // Use this for initialization
     void Start()
@@ -30,6 +32,7 @@ public class Vine : MonoBehaviour
         m_fTimer = Time.time;
     }
 
+    public static void SetMaxSplits(int _iValue) { MaxSplits = _iValue; }
     public int GetID() { return m_iID; }
 
     //Cleans up the child after it has been destroyed
@@ -56,8 +59,8 @@ public class Vine : MonoBehaviour
 
     public void Create(GameObject _Parent, float _fAngle, bool _bGrowRight)
     {
+        GetComponent<MeshRenderer>().material = VineMaterials[1];
         //Setting parameter variables
-        
         m_iID = CubeID++;
         m_bSplit = false;
         m_Parent = _Parent;
@@ -141,6 +144,7 @@ public class Vine : MonoBehaviour
             if (Time.time - m_fTimer > GrowthRate && m_Child == null && m_Child2 == null && m_bSplit && MaxSplits > 0)
             {
                 MaxSplits--;
+                GetComponent<MeshRenderer>().material = VineMaterials[0];
 
                 GameObject temp = Instantiate(VinePrefab) as GameObject;                            
                 GameObject temp2 = Instantiate(VinePrefab) as GameObject;
@@ -156,7 +160,7 @@ public class Vine : MonoBehaviour
 
                 GetComponent<DestroyVine>().PassChildren(m_Child, m_Child2);
 
-                if (gameObject.tag != "VineRoot") gameObject.tag = "Vine";
+                if(gameObject.tag != "VineRoot") gameObject.tag = "Vine";
                 IDLE = true;
             }
             else if(m_bSplit && MaxSplits <= 0)
@@ -166,16 +170,15 @@ public class Vine : MonoBehaviour
             //Otherwise continue growing
             else if (Time.time - m_fTimer > GrowthRate && m_Child == null && !m_bSplit)
             {
+                GetComponent<MeshRenderer>().material = VineMaterials[0];
+
                 m_Child = Instantiate(VinePrefab, gameObject.transform) as GameObject;
                 m_Child.GetComponent<Vine>().Create(gameObject, m_fNextAngle, m_bGrowRight);
                 m_Child.name = gameObject.name;
 
                 GetComponent<DestroyVine>().PassChildren(m_Child, null);
 
-                if (!gameObject.CompareTag("VineHead"))
-                {
-                    gameObject.tag = "Vine";
-                }
+                if (gameObject.tag != "VineRoot") gameObject.tag = "Vine";
                 IDLE = true;
             }          
         }
