@@ -11,6 +11,9 @@ public class FauxGravityMovement : MonoBehaviour
     public float xBoundries = 9.0f; //horizontal boundry border
     public float objectHeight = 2.0f; //height of the object
     public float rayVariation = 0.2f; //wiggle room for ray calculation
+    public AudioSource attackSound; //reference to attack sound
+    public AudioSource jumpSound; //reference to jump sound
+    public AudioSource landSound; // reference to landing sound
     //public Transform planet;
     //public float distanceBetween = 0.0f;
 
@@ -21,8 +24,8 @@ public class FauxGravityMovement : MonoBehaviour
     FauxGravityBody m_fauxBody; //reference to faux body
     bool m_bCanJump = true; //checks whether can jump
     bool m_bCanAttack = true; //checks whether can attack
-    public bool m_bFalling = false; //checks if falling
-    public bool m_bRising = false; //check if rising
+    bool m_bFalling = false; //checks if falling
+    bool m_bRising = false; //check if rising
     private Animator m_Animator; //reference to animator on object
 
     void Start()
@@ -158,7 +161,7 @@ public class FauxGravityMovement : MonoBehaviour
     }
 
     //checks to see if object is currently on the ground
-    public bool CheckGrounded()
+    bool CheckGrounded()
     {
         bool onGround = false;
         Ray ray = new Ray(transform.position, -transform.up);
@@ -234,8 +237,21 @@ public class FauxGravityMovement : MonoBehaviour
 
     void DebugRay()
     {
-        
         Debug.DrawRay(transform.position, -transform.up * (objectHeight + rayVariation));
+    }
 
+    void PlayAttackSound()
+    {
+        attackSound.Play();
+    }
+
+    void PlayJumpSound()
+    {
+        jumpSound.Play();
+    }
+
+    void PlayLandingSound()
+    {
+        landSound.Play();
     }
 }
