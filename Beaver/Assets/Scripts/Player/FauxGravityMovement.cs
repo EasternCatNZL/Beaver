@@ -158,7 +158,7 @@ public class FauxGravityMovement : MonoBehaviour
     }
 
     //checks to see if object is currently on the ground
-    bool CheckGrounded()
+    public bool CheckGrounded()
     {
         bool onGround = false;
         Ray ray = new Ray(transform.position, -transform.up);
